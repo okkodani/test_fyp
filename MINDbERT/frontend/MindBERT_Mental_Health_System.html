@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MindScope — Neural Mental Health Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0d14;
+  --bg2: #111520;
+  --bg3: #171c2e;
+  --surface: #1d2235;
+  --surface2: #252a40;
+  --border: #2a3050;
+  --border2: #353d60;
+  --text: #e8ecf5;
+  --text2: #9aa3c0;
+  --text3: #6370a0;
+  --accent: #4f6ef7;
+  --accent2: #7b8ffb;
+  --green: #22d3a0;
+  --orange: #f97316;
+  --red: #ef4444;
+  --yellow: #facc15;
+  --purple: #a855f7;
+  --teal: #06b6d4;
+  --cat-depression: #ef4444;
+  --cat-anxiety: #f97316;
+  --cat-stress: #eab308;
+  --cat-ptsd: #a855f7;
+  --cat-bipolar: #06b6d4;
+  --cat-normal: #22c55e;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Auth Screen ── */
+.auth-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse 80% 60% at 50% 20%, #1a2060 0%, var(--bg) 70%);
+  position: relative;
+}
+.auth-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(79,110,247,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(168,85,247,0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+.grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(79,110,247,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79,110,247,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+.auth-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 44px 40px;
+  width: 400px;
+  max-width: 95vw;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(79,110,247,0.1);
+}
+.auth-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.auth-logo .brain-icon {
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 100%);
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 12px;
+  box-shadow: 0 8px 24px rgba(79,110,247,0.3);
+}
+.auth-logo h1 {
+  font-family: 'Space Mono', monospace;
+  font-size: 22px;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+.auth-logo p {
+  font-size: 13px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+.role-tabs {
+  display: flex;
+  background: var(--bg3);
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+.role-tab {
+  flex: 1;
+  padding: 8px;
+  text-align: center;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text3);
+  transition: all 0.2s;
+}
+.role-tab.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.form-input {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus { border-color: var(--accent); }
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--accent) 0%, #6d5ef7 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(79,110,247,0.4); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.demo-creds {
+  margin-top: 20px;
+  padding: 12px;
+  background: rgba(79,110,247,0.08);
+  border: 1px solid rgba(79,110,247,0.2);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text2);
+  font-family: 'Space Mono', monospace;
+}
+.demo-creds p { margin-bottom: 2px; }
+.err-msg {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #f87171;
+  margin-bottom: 16px;
+}
+
+/* ── App Shell ── */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+.sidebar {
+  width: 240px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 100;
+}
+.sidebar-logo {
+  padding: 20px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sidebar-logo .icon {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.sidebar-logo span {
+  font-family: 'Space Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 10px;
+  overflow-y: auto;
+}
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 8px 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text2);
+  transition: all 0.15s;
+  margin-bottom: 2px;
+}
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: rgba(79,110,247,0.15); color: var(--accent2); }
+.nav-item .ni { width: 18px; text-align: center; }
+.sidebar-footer {
+  padding: 14px 10px;
+  border-top: 1px solid var(--border);
+}
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--bg3);
+}
+.user-avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.user-avatar.admin { background: linear-gradient(135deg, var(--accent), var(--purple)); }
+.user-avatar.user { background: linear-gradient(135deg, var(--green), var(--teal)); }
+.user-info { flex: 1; min-width: 0; }
+.user-info .uname { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* .user-info .uname { font-size: 13px; font-weight: 600; truncate; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } */
+.user-info .urole {
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.logout-btn {
+  background: none; border: none; color: var(--text3);
+  cursor: pointer; padding: 4px; font-size: 14px;
+  transition: color 0.15s;
+}
+.logout-btn:hover { color: var(--red); }
+
+/* ── Main Content ── */
+.main-content {
+  margin-left: 240px;
+  flex: 1;
+  min-height: 100vh;
+}
+.page-header {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.page-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  color: var(--text);
+}
+.page-header p { font-size: 13px; color: var(--text3); margin-top: 2px; }
+.page-body { padding: 24px 28px; }
+
+/* ── Cards ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-header h3 { font-size: 15px; font-weight: 600; }
+.card-body { padding: 20px; }
+
+/* ── Stats Grid ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.stat-card.blue::before { background: var(--accent); }
+.stat-card.green::before { background: var(--green); }
+.stat-card.orange::before { background: var(--orange); }
+.stat-card.purple::before { background: var(--purple); }
+.stat-card.red::before { background: var(--red); }
+.stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.stat-value { font-size: 28px; font-weight: 700; font-family: 'Space Mono', monospace; }
+.stat-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+/* ── Analyze Page ── */
+.analyze-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.textarea-wrap { position: relative; }
+.analyze-textarea {
+  width: 100%;
+  height: 220px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+  line-height: 1.6;
+}
+.analyze-textarea:focus { border-color: var(--accent); }
+.char-count { position: absolute; bottom: 10px; right: 12px; font-size: 11px; color: var(--text3); }
+.btn-analyze {
+  margin-top: 12px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--accent), #6d5ef7);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-analyze:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(79,110,247,0.4); }
+.btn-analyze:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* ── Results ── */
+.result-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.result-label-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+}
+.confidence-bar-wrap { margin-bottom: 4px; }
+.confidence-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 5px;
+}
+.confidence-bar-bg {
+  background: var(--bg3);
+  border-radius: 4px;
+  height: 6px;
+  overflow: hidden;
+}
+.confidence-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* ── Risk Badge ── */
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.risk-badge.Low { background: rgba(34,211,160,0.15); color: var(--green); }
+.risk-badge.Moderate { background: rgba(250,204,21,0.15); color: var(--yellow); }
+.risk-badge.High { background: rgba(249,115,22,0.15); color: var(--orange); }
+.risk-badge.Critical { background: rgba(239,68,68,0.15); color: var(--red); animation: pulse 1.5s infinite; }
+
+@keyframes pulse {
+  0%,100% { box-shadow: none; }
+  50% { box-shadow: 0 0 0 4px rgba(239,68,68,0.2); }
+}
+
+/* ── Recommendations ── */
+.rec-section { margin-top: 4px; }
+.rec-item {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text2);
+}
+.rec-item:last-child { border-bottom: none; }
+.rec-icon { flex-shrink: 0; }
+
+/* ── History Table ── */
+.history-table { width: 100%; border-collapse: collapse; }
+.history-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+.history-table td {
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.history-table tr:last-child td { border-bottom: none; }
+.history-table tr:hover td { background: rgba(255,255,255,0.02); }
+.text-snippet {
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* ── Category Color Helpers ── */
+.cat-Depression { color: var(--cat-depression); }
+.cat-Anxiety { color: var(--cat-anxiety); }
+.cat-Stress { color: var(--cat-stress); }
+.cat-PTSD { color: var(--cat-ptsd); }
+.cat-Bipolar { color: var(--cat-bipolar); }
+.cat-Normal { color: var(--cat-normal); }
+
+.dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ── Admin Users ── */
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+.user-stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.user-big-avatar {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.user-details .u-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+.user-details .u-email { font-size: 12px; color: var(--text3); margin-bottom: 6px; }
+.user-details .u-meta { display: flex; gap: 10px; font-size: 12px; color: var(--text2); }
+
+/* ── About / Model Info ── */
+.model-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.info-list { list-style: none; }
+.info-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.info-list li:last-child { border-bottom: none; }
+.info-list li span:first-child { color: var(--text3); }
+.info-list li span:last-child { color: var(--text); font-weight: 500; font-family: 'Space Mono', monospace; font-size: 12px; }
+
+/* ── Urgent Banner ── */
+.urgent-banner {
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.35);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #f87171;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+/* ── Loading Spinner ── */
+.spin {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 20px;
+}
+.modal-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+}
+.modal-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+.btn-sec {
+  padding: 9px 20px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+.btn-sec:hover { border-color: var(--border2); }
+.btn-danger {
+  padding: 9px 20px;
+  background: rgba(239,68,68,0.15);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 8px;
+  color: var(--red);
+  font-size: 14px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+.btn-danger:hover { background: rgba(239,68,68,0.25); }
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.tag.admin { background: rgba(79,110,247,0.15); color: var(--accent2); }
+.tag.user { background: rgba(34,211,160,0.1); color: var(--green); }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .analyze-grid { grid-template-columns: 1fr; }
+  .model-info-grid { grid-template-columns: 1fr; }
+  .sidebar { width: 200px; }
+  .main-content { margin-left: 200px; }
+}
+@media (max-width: 700px) {
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useCallback } = React;
+
+// ── API Layer (all calls go to Flask backend) ──────────────────────────────
+const API = {
+  token: () => localStorage.getItem("mindbert_token"),
+  headers: () => ({
+    "Content-Type": "application/json",
+    ...(API.token() ? { "Authorization": `Bearer ${API.token()}` } : {}),
+  }),
+
+  async request(method, path, body) {
+    const res = await fetch(path, {
+      method,
+      headers: API.headers(),
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Request failed");
+    return data;
+  },
+
+  login:       (username, password) => API.request("POST", "/api/auth/login", { username, password }),
+  analyze:     (text)               => API.request("POST", "/api/analyze", { text }),
+  history:     ()                   => API.request("GET",  "/api/history"),
+  getRecord:   (id)                 => API.request("GET",  `/api/history/${id}`),
+  adminStats:  ()                   => API.request("GET",  "/api/admin/stats"),
+  listUsers:   ()                   => API.request("GET",  "/api/admin/users"),
+  createUser:  (data)               => API.request("POST", "/api/admin/users", data),
+  deleteUser:  (username)           => API.request("DELETE", `/api/admin/users/${username}`),
+};
+
+// ── Colors / Labels ────────────────────────────────────────────────────────
+const CAT_COLORS = {
+  "Depression":        "#ef4444",
+  "Anxiety":           "#f97316",
+  "Stress":            "#eab308",
+  "PTSD":              "#a855f7",
+  "Bipolar Disorder":  "#06b6d4",
+  "Bipolar":           "#06b6d4",
+  "Normal / Healthy":  "#22c55e",
+  "Normal":            "#22c55e",
+  "Suicidal":          "#dc2626",
+  "Personality disorder": "#8b5cf6",
+  "Personality Disorder": "#8b5cf6",
+};
+const getLabelColor = (l) => CAT_COLORS[l] || "#64748b";
+
+const DEFAULT_CATEGORIES = [
+  "Normal","Depression","Suicidal","Anxiety","Bipolar","Stress","Personality disorder"
+];
+
+// ── StatCard ───────────────────────────────────────────────────────────────
+function StatCard({ color, label, value, sub }) {
+  return (
+    <div className={`stat-card ${color}`}>
+      <div className="stat-label">{label}</div>
+      <div className="stat-value">{value}</div>
+      {sub && <div className="stat-sub">{sub}</div>}
+    </div>
+  );
+}
+
+// ── Main App ───────────────────────────────────────────────────────────────
+function App() {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [page, setPage] = useState("analyze");
+
+  // Restore session from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("mindbert_user");
+    if (saved && API.token()) {
+      try { setCurrentUser(JSON.parse(saved)); } catch(e) {}
+    }
+  }, []);
+
+  const login = (user) => {
+    setCurrentUser(user);
+    localStorage.setItem("mindbert_user", JSON.stringify(user));
+    setPage(user.role === "admin" ? "dashboard" : "analyze");
+  };
+
+  const logout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem("mindbert_token");
+    localStorage.removeItem("mindbert_user");
+    setPage("analyze");
+  };
+
+  if (!currentUser) return <LoginPage onLogin={login} />;
+
+  return (
+    <div className="app-shell">
+      <Sidebar user={currentUser} page={page} setPage={setPage} onLogout={logout} />
+      <div className="main-content">
+        {page === "dashboard" && currentUser.role === "admin" && <AdminDashboard user={currentUser} />}
+        {page === "analyze"   && <AnalyzePage user={currentUser} />}
+        {page === "history"   && <HistoryPage user={currentUser} />}
+        {page === "users"     && currentUser.role === "admin" && <UsersPage user={currentUser} />}
+        {page === "about"     && <AboutPage />}
+      </div>
+    </div>
+  );
+}
+
+// ── Login ──────────────────────────────────────────────────────────────────
+function LoginPage({ onLogin }) {
+  const [activeRole, setActiveRole] = useState("user");
+  const [username,   setUsername]   = useState("");
+  const [password,   setPassword]   = useState("");
+  const [error,      setError]      = useState("");
+  const [loading,    setLoading]    = useState(false);
+
+  const handleLogin = async () => {
+    if (!username || !password) { setError("Please enter username and password."); return; }
+    setError(""); setLoading(true);
+    try {
+      const data = await API.login(username, password);
+      const user = data.user;
+      if (activeRole === "admin" && user.role !== "admin") {
+        setError("This account does not have admin privileges."); setLoading(false); return;
+      }
+      if (activeRole === "user" && user.role !== "user") {
+        setError("Please use the Admin tab to log in as admin."); setLoading(false); return;
+      }
+      localStorage.setItem("mindbert_token", data.token);
+      onLogin(user);
+    } catch (e) {
+      setError(e.message || "Invalid credentials.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fillDemo = () => {
+    if (activeRole === "admin") { setUsername("admin"); setPassword("admin123"); }
+    else { setUsername("user1"); setPassword("user123"); }
+  };
+
+  return (
+    <div className="auth-wrap">
+      <div className="grid-bg" />
+      <div className="auth-card">
+        <div className="auth-logo">
+          <div className="brain-icon">🧠</div>
+          <h1>MindScope</h1>
+          <p>Neural Network Mental Health Analysis System</p>
+        </div>
+
+        <div className="role-tabs">
+          {["user","admin"].map(r => (
+            <div key={r} className={`role-tab ${activeRole===r?"active":""}`}
+              onClick={() => { setActiveRole(r); setError(""); setUsername(""); setPassword(""); }}>
+              {r === "admin" ? "👤 Admin" : "🙋 User"}
+            </div>
+          ))}
+        </div>
+
+        {error && <div className="err-msg">{error}</div>}
+
+        <div className="form-group">
+          <label>Username</label>
+          <input className="form-input" value={username} onChange={e => setUsername(e.target.value)}
+            placeholder={activeRole === "admin" ? "admin" : "user1"}
+            onKeyDown={e => e.key === "Enter" && handleLogin()} />
+        </div>
+        <div className="form-group">
+          <label>Password</label>
+          <input type="password" className="form-input" value={password} onChange={e => setPassword(e.target.value)}
+            placeholder="••••••••" onKeyDown={e => e.key === "Enter" && handleLogin()} />
+        </div>
+        <button className="btn-primary" onClick={handleLogin} disabled={loading}>
+          {loading ? <><span className="spin" /> Authenticating...</> : `Sign In as ${activeRole === "admin" ? "Admin" : "User"}`}
+        </button>
+
+        <div className="demo-creds">
+          <p style={{marginBottom:6,color:"var(--text2)",fontFamily:"DM Sans,sans-serif",fontSize:12}}>Demo credentials:</p>
+          {activeRole === "admin"
+            ? <><p>Username: admin</p><p>Password: admin123</p></>
+            : <><p>Username: user1 or user2</p><p>Password: user123</p></>
+          }
+          <button onClick={fillDemo} style={{marginTop:8,background:"rgba(79,110,247,0.2)",border:"none",color:"var(--accent2)",padding:"4px 10px",borderRadius:4,cursor:"pointer",fontSize:11,fontFamily:"DM Sans,sans-serif"}}>
+            Auto-fill
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Sidebar ────────────────────────────────────────────────────────────────
+function Sidebar({ user, page, setPage, onLogout }) {
+  const adminNav = [
+    { id:"dashboard", icon:"📊", label:"Dashboard" },
+    { id:"analyze",   icon:"🔍", label:"Analyze Text" },
+    { id:"history",   icon:"📋", label:"All Records" },
+    { id:"users",     icon:"👥", label:"Manage Users" },
+    { id:"about",     icon:"🤖", label:"Model Info" },
+  ];
+  const userNav = [
+    { id:"analyze", icon:"🔍", label:"Analyze Text" },
+    { id:"history", icon:"📋", label:"My History" },
+    { id:"about",   icon:"🤖", label:"Model Info" },
+  ];
+  const nav = user.role === "admin" ? adminNav : userNav;
+  const initials = user.name.split(" ").map(w => w[0]).join("").slice(0,2).toUpperCase();
+
+  return (
+    <div className="sidebar">
+      <div className="sidebar-logo">
+        <div className="icon">🧠</div>
+        <span>MindBERT</span>
+      </div>
+      <div className="sidebar-nav">
+        {user.role === "admin" && <div className="nav-section-label">Admin Panel</div>}
+        {user.role === "user"  && <div className="nav-section-label">User Portal</div>}
+        {nav.map(n => (
+          <div key={n.id} className={`nav-item ${page===n.id?"active":""}`} onClick={() => setPage(n.id)}>
+            <span className="ni">{n.icon}</span>{n.label}
+          </div>
+        ))}
+      </div>
+      <div className="sidebar-footer">
+        <div className="user-card">
+          <div className={`user-avatar ${user.role}`}>{initials}</div>
+          <div className="user-info">
+            <div className="uname">{user.name}</div>
+            <div className="urole">{user.role}</div>
+          </div>
+          <button className="logout-btn" onClick={onLogout} title="Logout">⏻</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Admin Dashboard ────────────────────────────────────────────────────────
+function AdminDashboard({ user }) {
+  const [stats,   setStats]   = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState("");
+
+  useEffect(() => {
+    API.adminStats()
+      .then(setStats)
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <LoadingScreen msg="Loading dashboard..." />;
+  if (error)   return <ErrorScreen msg={error} />;
+
+  const catCounts  = stats.category_distribution || {};
+  const riskCounts = { Low:0, Moderate:0, High:0, Critical:0, ...stats.risk_distribution };
+  const criticals  = stats.critical_cases || [];
+  const categories = Object.keys(catCounts).length ? Object.keys(catCounts) : DEFAULT_CATEGORIES;
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>Admin Dashboard</h2>
+        <p>System overview and mental health analytics — data from Firebase</p>
+      </div>
+      <div className="page-body">
+        <div className="stats-grid">
+          <StatCard color="blue"   label="Total Analyses" value={stats.total_analyses}  sub="All time" />
+          <StatCard color="green"  label="Active Users"   value={stats.total_users}     sub="Registered accounts" />
+          <StatCard color="orange" label="Avg Confidence" value={stats.avg_confidence+"%"} sub="BERT model score" />
+          <StatCard color="red"    label="Critical Cases" value={criticals.length}      sub="Requires attention" />
+          <StatCard color="purple" label="High/Critical"  value={(riskCounts.High||0) + (riskCounts.Critical||0)} sub="High-risk cases" />
+        </div>
+
+        {criticals.length > 0 && (
+          <div className="card" style={{marginBottom:20}}>
+            <div className="card-header">
+              <h3 style={{color:"var(--red)"}}>⚠️ Critical Cases Requiring Attention</h3>
+            </div>
+            <div className="card-body">
+              {criticals.slice(0,5).map((r,i) => (
+                <div key={i} className="urgent-banner" style={{marginBottom:8}}>
+                  <span>🚨</span>
+                  <div>
+                    <strong>{r.user_name}</strong> — {r.result.predicted_label} ({r.result.confidence}%)
+                    <br /><span style={{fontSize:12,opacity:0.8}}>{r.text_snippet}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,marginBottom:20}}>
+          <div className="card">
+            <div className="card-header"><h3>Category Distribution</h3></div>
+            <div className="card-body">
+              {categories.map(cat => {
+                const count = catCounts[cat] || 0;
+                const pct   = stats.total_analyses ? Math.round((count/stats.total_analyses)*100) : 0;
+                return (
+                  <div key={cat} style={{marginBottom:12}}>
+                    <div style={{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:4}}>
+                      <span style={{color:"var(--text2)"}}>{cat}</span>
+                      <span style={{color:getLabelColor(cat),fontWeight:600}}>{count} ({pct}%)</span>
+                    </div>
+                    <div className="confidence-bar-bg">
+                      <div className="confidence-bar-fill" style={{width:pct+"%",background:getLabelColor(cat)}} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="card-header"><h3>Risk Level Distribution</h3></div>
+            <div className="card-body">
+              {Object.entries(riskCounts).map(([risk, count]) => {
+                const colors = {Low:"var(--green)",Moderate:"var(--yellow)",High:"var(--orange)",Critical:"var(--red)"};
+                const pct    = stats.total_analyses ? Math.round((count/stats.total_analyses)*100) : 0;
+                return (
+                  <div key={risk} style={{marginBottom:12}}>
+                    <div style={{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:4}}>
+                      <span style={{color:"var(--text2)"}}>{risk}</span>
+                      <span style={{color:colors[risk],fontWeight:600}}>{count} ({pct}%)</span>
+                    </div>
+                    <div className="confidence-bar-bg">
+                      <div className="confidence-bar-fill" style={{width:pct+"%",background:colors[risk]}} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Analyze Page ───────────────────────────────────────────────────────────
+function AnalyzePage({ user }) {
+  const [text,    setText]    = useState("");
+  const [result,  setResult]  = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [phase,   setPhase]   = useState("");
+  const [error,   setError]   = useState("");
+
+  const analyze = async () => {
+    if (!text.trim() || text.length < 3) return;
+    setLoading(true); setResult(null); setError("");
+
+    const phases = ["Tokenizing with BERT…","Running forward pass…","Applying softmax…","Saving to Firebase…"];
+    for (const p of phases) {
+      setPhase(p);
+      await new Promise(r => setTimeout(r, 400));
+    }
+
+    try {
+      const data = await API.analyze(text);
+      const res  = data.result;
+      // Attach recommendation from server response
+      res.recommendation = data.recommendation;
+      setResult(res);
+    } catch (e) {
+      setError(e.message || "Analysis failed. Make sure the backend is running.");
+    } finally {
+      setLoading(false); setPhase("");
+    }
+  };
+
+  const reset = () => { setText(""); setResult(null); setError(""); };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>🔍 Analyze Mental Health Text</h2>
+        <p>BERT-powered classification — results saved to Firebase automatically</p>
+      </div>
+      <div className="page-body">
+        {error && <div className="err-msg" style={{marginBottom:16}}>{error}</div>}
+        <div className="analyze-grid">
+          {/* Input */}
+          <div>
+            <div className="card">
+              <div className="card-header">
+                <h3>Input Text</h3>
+                <span style={{fontSize:12,color:"var(--text3)"}}>{text.length}/5000</span>
+              </div>
+              <div className="card-body">
+                <div className="textarea-wrap">
+                  <textarea className="analyze-textarea" value={text}
+                    onChange={e => setText(e.target.value.slice(0,5000))}
+                    placeholder={"Describe how you're feeling…\n\nExample: 'I have been feeling very anxious lately, my heart races whenever I go outside and I'm constantly worrying about everything.'"} />
+                </div>
+                <div style={{display:"flex",gap:10,marginTop:12,flexWrap:"wrap"}}>
+                  <button className="btn-analyze" onClick={analyze} disabled={loading || text.length < 3}>
+                    {loading ? <><span className="spin"/> {phase}</> : <><span>🧠</span> Analyze with BERT</>}
+                  </button>
+                  {result && <button className="btn-sec" onClick={reset}>Clear</button>}
+                </div>
+
+                <div style={{marginTop:16}}>
+                  <div style={{fontSize:11,color:"var(--text3)",marginBottom:8,textTransform:"uppercase",letterSpacing:"0.5px"}}>Try an example:</div>
+                  {[
+                    ["Depression",       "I feel hopeless and worthless. Nothing matters anymore and I just want everything to stop."],
+                    ["Anxiety",          "I've been having panic attacks and I'm constantly worried about everything. My heart races all the time."],
+                    ["Normal / Healthy", "I feel happy and grateful today. I've been exercising and feeling positive and motivated."],
+                  ].map(([label, ex]) => (
+                    <div key={label} onClick={() => setText(ex)} style={{
+                      padding:"8px 12px",marginBottom:6,background:"var(--bg3)",
+                      border:"1px solid var(--border)",borderRadius:6,cursor:"pointer",
+                      fontSize:12,color:"var(--text2)",transition:"all 0.15s"
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.borderColor="var(--accent)"}
+                    onMouseLeave={e => e.currentTarget.style.borderColor="var(--border)"}>
+                      <span style={{color:getLabelColor(label),fontWeight:700,marginRight:6}}>[{label}]</span>
+                      {ex.slice(0,70)}...
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Results */}
+          <div>
+            {!result && !loading && (
+              <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100%",minHeight:300}}>
+                <div style={{textAlign:"center",color:"var(--text3)"}}>
+                  <div style={{fontSize:48,marginBottom:12}}>🧠</div>
+                  <p style={{fontSize:14}}>Analysis results will appear here</p>
+                  <p style={{fontSize:12,marginTop:4}}>Results are saved to Firebase after analysis</p>
+                </div>
+              </div>
+            )}
+
+            {loading && (
+              <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100%",minHeight:300}}>
+                <div style={{textAlign:"center"}}>
+                  <div style={{fontSize:48,marginBottom:16,animation:"spin 2s linear infinite",display:"inline-block"}}>🧠</div>
+                  <p style={{fontSize:14,color:"var(--text2)"}}>{phase}</p>
+                  <p style={{fontSize:12,color:"var(--text3)",marginTop:4}}>BERT model processing…</p>
+                </div>
+              </div>
+            )}
+
+            {result && <ResultPanel result={result} />}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── ResultPanel ────────────────────────────────────────────────────────────
+function ResultPanel({ result }) {
+  const rec = result.recommendation || {};
+  const probs = result.probabilities || {};
+  const catKeys = Object.keys(probs).length ? Object.keys(probs) : DEFAULT_CATEGORIES;
+
+  return (
+    <div className="result-panel">
+      <div className="card">
+        <div className="card-header">
+          <h3>Classification Result</h3>
+          <span className={`risk-badge ${result.risk_level}`}>
+            {result.risk_level === "Critical" ? "🚨" : result.risk_level === "High" ? "⚠️" : result.risk_level === "Low" ? "✅" : "🔶"} {result.risk_level} Risk
+          </span>
+        </div>
+        <div className="card-body">
+          {result.risk_level === "Critical" && (
+            <div className="urgent-banner" style={{marginBottom:16}}>
+              🚨 URGENT: Please seek immediate help — call 999 or MMHA 03-2780 6803 now.
+            </div>
+          )}
+          <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
+            <div style={{
+              padding:"8px 18px",borderRadius:20,
+              background:getLabelColor(result.predicted_label)+"25",
+              border:`1px solid ${getLabelColor(result.predicted_label)}50`,
+              color:getLabelColor(result.predicted_label),
+              fontFamily:"Space Mono,monospace",fontWeight:700,fontSize:14
+            }}>{result.predicted_label}</div>
+            <div style={{fontSize:13,color:"var(--text2)"}}>
+              Confidence: <strong style={{color:"var(--text)"}}>{result.confidence}%</strong>
+            </div>
+            {result.is_real_ai === false && (
+              <span style={{fontSize:11,background:"rgba(250,204,21,0.15)",color:"var(--yellow)",padding:"2px 8px",borderRadius:4}}>
+                Keyword fallback
+              </span>
+            )}
+          </div>
+
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>
+            <div style={{background:"var(--bg3)",borderRadius:8,padding:"10px 14px"}}>
+              <div style={{fontSize:11,color:"var(--text3)",marginBottom:4}}>Severity Score</div>
+              <div style={{fontSize:22,fontWeight:700,fontFamily:"Space Mono,monospace",
+                color:result.severity_score>70?"var(--red)":result.severity_score>40?"var(--orange)":"var(--green)"}}>
+                {result.severity_score}<span style={{fontSize:14}}>/100</span>
+              </div>
+            </div>
+            <div style={{background:"var(--bg3)",borderRadius:8,padding:"10px 14px"}}>
+              <div style={{fontSize:11,color:"var(--text3)",marginBottom:4}}>Model Confidence</div>
+              <div style={{fontSize:22,fontWeight:700,fontFamily:"Space Mono,monospace",color:"var(--accent2)"}}>
+                {result.confidence}<span style={{fontSize:14}}>%</span>
+              </div>
+            </div>
+          </div>
+
+          <div style={{fontSize:12,color:"var(--text3)",marginBottom:8,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.5px"}}>
+            All Category Probabilities
+          </div>
+          {catKeys.map(cat => (
+            <div key={cat} className="confidence-bar-wrap">
+              <div className="confidence-bar-label">
+                <span style={{display:"flex",alignItems:"center",gap:6}}>
+                  <span className="dot" style={{background:getLabelColor(cat)}} />{cat}
+                </span>
+                <span style={{fontFamily:"Space Mono,monospace"}}>{(probs[cat]||0)}%</span>
+              </div>
+              <div className="confidence-bar-bg">
+                <div className="confidence-bar-fill" style={{
+                  width:(probs[cat]||0)+"%",
+                  background: cat===result.predicted_label ? getLabelColor(cat) : getLabelColor(cat)+"60"
+                }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {rec.immediate && (
+        <div className="card">
+          <div className="card-header"><h3>💡 Recommendations</h3></div>
+          <div className="card-body">
+            {rec.immediate && (
+              <div style={{marginBottom:14}}>
+                <div style={{fontSize:11,color:"var(--text3)",marginBottom:6,fontWeight:600,textTransform:"uppercase"}}>Immediate Action</div>
+                <div style={{fontSize:13,color:"var(--text2)",padding:"10px",background:"var(--bg3)",borderRadius:6,borderLeft:"3px solid var(--accent)"}}>
+                  {rec.immediate}
+                </div>
+              </div>
+            )}
+            {rec.coping && (
+              <div style={{marginBottom:14}}>
+                <div style={{fontSize:11,color:"var(--text3)",marginBottom:6,fontWeight:600,textTransform:"uppercase"}}>Coping Strategies</div>
+                {rec.coping.map((c,i) => (
+                  <div key={i} className="rec-item"><span className="rec-icon">✦</span><span>{c}</span></div>
+                ))}
+              </div>
+            )}
+            {rec.resources && (
+              <div style={{marginBottom:14}}>
+                <div style={{fontSize:11,color:"var(--text3)",marginBottom:6,fontWeight:600,textTransform:"uppercase"}}>Resources</div>
+                {rec.resources.map((r,i) => (
+                  <div key={i} style={{fontSize:13,color:"var(--accent2)",padding:"4px 0",display:"flex",gap:8}}>
+                    <span>📞</span><span>{r}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {rec.professional && (
+              <div style={{background:"rgba(79,110,247,0.08)",border:"1px solid rgba(79,110,247,0.2)",borderRadius:6,padding:"10px",fontSize:13,color:"var(--text2)"}}>
+                <strong style={{color:"var(--accent2)"}}>Professional Note:</strong> {rec.professional}
+              </div>
+            )}
+            {rec.urgent && (
+              <div className="urgent-banner" style={{marginTop:14}}>{rec.urgent}</div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── History Page ───────────────────────────────────────────────────────────
+function HistoryPage({ user }) {
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState("");
+  const [detail,  setDetail]  = useState(null);
+
+  useEffect(() => {
+    API.history()
+      .then(d => setRecords(d.records || []))
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <LoadingScreen msg="Loading history from Firebase…" />;
+  if (error)   return <ErrorScreen msg={error} />;
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>{user.role === "admin" ? "📋 All Analysis Records" : "📋 My Analysis History"}</h2>
+        <p>{records.length} records found in Firebase</p>
+      </div>
+      <div className="page-body">
+        <div className="card">
+          <div style={{overflowX:"auto"}}>
+            <table className="history-table">
+              <thead>
+                <tr>
+                  {user.role === "admin" && <th>User</th>}
+                  <th>Text Snippet</th>
+                  <th>Category</th>
+                  <th>Confidence</th>
+                  <th>Risk</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {records.map(r => (
+                  <tr key={r.id}>
+                    {user.role === "admin" && <td style={{color:"var(--text)",fontWeight:500}}>{r.user_name}</td>}
+                    <td><div className="text-snippet">{r.text_snippet}</div></td>
+                    <td><span style={{color:getLabelColor(r.result.predicted_label),fontWeight:600,fontSize:12}}>{r.result.predicted_label}</span></td>
+                    <td style={{fontFamily:"Space Mono,monospace",fontSize:12}}>{r.result.confidence}%</td>
+                    <td><span className={`risk-badge ${r.result.risk_level}`}>{r.result.risk_level}</span></td>
+                    <td style={{fontSize:12}}>{r.timestamp.slice(0,10)}</td>
+                    <td>
+                      <button onClick={() => setDetail(r)} style={{
+                        background:"rgba(79,110,247,0.1)",border:"none",color:"var(--accent2)",
+                        padding:"4px 10px",borderRadius:5,cursor:"pointer",fontSize:12,fontFamily:"DM Sans,sans-serif"
+                      }}>View</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {records.length === 0 && (
+              <div style={{padding:40,textAlign:"center",color:"var(--text3)"}}>
+                No analysis records found yet.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {detail && (
+        <div className="modal-overlay" onClick={() => setDetail(null)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <h3>Analysis Detail</h3>
+            <div style={{marginBottom:12}}>
+              <div style={{fontSize:11,color:"var(--text3)",marginBottom:4}}>TEXT ANALYZED</div>
+              <div style={{background:"var(--bg3)",padding:12,borderRadius:8,fontSize:13,color:"var(--text2)",lineHeight:1.6}}>
+                {detail.text_snippet}
+              </div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
+              <div><div style={{fontSize:11,color:"var(--text3)"}}>CATEGORY</div>
+                <div style={{color:getLabelColor(detail.result.predicted_label),fontWeight:700,marginTop:2}}>{detail.result.predicted_label}</div></div>
+              <div><div style={{fontSize:11,color:"var(--text3)"}}>RISK LEVEL</div>
+                <div style={{marginTop:2}}><span className={`risk-badge ${detail.result.risk_level}`}>{detail.result.risk_level}</span></div></div>
+              <div><div style={{fontSize:11,color:"var(--text3)"}}>CONFIDENCE</div>
+                <div style={{fontFamily:"Space Mono,monospace",fontWeight:700,marginTop:2}}>{detail.result.confidence}%</div></div>
+              <div><div style={{fontSize:11,color:"var(--text3)"}}>SEVERITY</div>
+                <div style={{fontFamily:"Space Mono,monospace",fontWeight:700,marginTop:2}}>{detail.result.severity_score}/100</div></div>
+            </div>
+            {detail.result.probabilities && (
+              <div style={{marginBottom:12}}>
+                <div style={{fontSize:11,color:"var(--text3)",marginBottom:6}}>PROBABILITIES</div>
+                {Object.entries(detail.result.probabilities).map(([cat,pct]) => (
+                  <div key={cat} style={{marginBottom:6}}>
+                    <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:2}}>
+                      <span style={{color:"var(--text2)"}}>{cat}</span>
+                      <span style={{fontFamily:"Space Mono,monospace"}}>{pct}%</span>
+                    </div>
+                    <div className="confidence-bar-bg">
+                      <div className="confidence-bar-fill" style={{width:pct+"%",background:getLabelColor(cat)}} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="modal-actions">
+              <button className="btn-sec" onClick={() => setDetail(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Users Page (Admin) ─────────────────────────────────────────────────────
+function UsersPage({ user }) {
+  const [users,        setUsers]        = useState([]);
+  const [loading,      setLoading]      = useState(true);
+  const [error,        setError]        = useState("");
+  const [showAdd,      setShowAdd]      = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [form,         setForm]         = useState({ username:"", name:"", email:"", password:"", role:"user" });
+  const [formError,    setFormError]    = useState("");
+  const [saving,       setSaving]       = useState(false);
+
+  const load = () => {
+    setLoading(true);
+    API.listUsers()
+      .then(d => setUsers(d.users || []))
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  };
+  useEffect(load, []);
+
+  const addUser = async () => {
+    setFormError("");
+    if (!form.username || !form.name || !form.password) { setFormError("All fields required."); return; }
+    setSaving(true);
+    try {
+      await API.createUser(form);
+      setShowAdd(false);
+      setForm({ username:"", name:"", email:"", password:"", role:"user" });
+      load();
+    } catch(e) {
+      setFormError(e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteUser = async () => {
+    if (!deleteTarget) return;
+    try {
+      await API.deleteUser(deleteTarget.username);
+      setDeleteTarget(null);
+      load();
+    } catch(e) {
+      alert("Delete failed: " + e.message);
+    }
+  };
+
+  if (loading) return <LoadingScreen msg="Loading users from Firebase…" />;
+  if (error)   return <ErrorScreen msg={error} />;
+
+  return (
+    <div>
+      <div className="page-header">
+        <h2>👥 Manage Users</h2>
+        <p>{users.length} total accounts in Firebase</p>
+      </div>
+      <div className="page-body">
+        <div style={{display:"flex",justifyContent:"flex-end",marginBottom:16}}>
+          <button className="btn-analyze" onClick={() => setShowAdd(true)}>+ Add User</button>
+        </div>
+        <div className="users-grid">
+          {users.map(u => {
+            const initials = u.name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+            const colors = {admin:"linear-gradient(135deg,var(--accent),var(--purple))",user:"linear-gradient(135deg,var(--green),var(--teal))"};
+            return (
+              <div key={u.id} className="user-stat-card">
+                <div className="user-big-avatar" style={{background:colors[u.role]||colors.user}}>{initials}</div>
+                <div className="user-details" style={{flex:1}}>
+                  <div className="u-name">{u.name}</div>
+                  <div className="u-email">{u.email || u.username}</div>
+                  <div className="u-meta">
+                    <span className={`tag ${u.role}`}>{u.role}</span>
+                  </div>
+                </div>
+                {u.role !== "admin" && (
+                  <button onClick={() => setDeleteTarget(u)} style={{
+                    background:"none",border:"none",color:"var(--text3)",
+                    cursor:"pointer",fontSize:16,padding:"4px",transition:"color 0.15s"
+                  }}
+                  onMouseEnter={e=>e.target.style.color="var(--red)"}
+                  onMouseLeave={e=>e.target.style.color="var(--text3)"}>🗑</button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {showAdd && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h3>Add New User</h3>
+            {formError && <div className="err-msg">{formError}</div>}
+            {[["username","Username"],["name","Full Name"],["email","Email"],["password","Password"]].map(([field,label]) => (
+              <div className="form-group" key={field}>
+                <label>{label}</label>
+                <input type={field==="password"?"password":"text"} className="form-input"
+                  value={form[field]} onChange={e => setForm({...form,[field]:e.target.value})} />
+              </div>
+            ))}
+            <div className="form-group">
+              <label>Role</label>
+              <select className="form-input" value={form.role} onChange={e => setForm({...form,role:e.target.value})}>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div className="modal-actions">
+              <button className="btn-sec" onClick={() => { setShowAdd(false); setFormError(""); }}>Cancel</button>
+              <button className="btn-primary" style={{width:"auto"}} onClick={addUser} disabled={saving}>
+                {saving ? "Creating…" : "Create User"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h3>Delete User</h3>
+            <p style={{fontSize:14,color:"var(--text2)"}}>
+              Are you sure you want to delete <strong style={{color:"var(--text)"}}>{deleteTarget.name}</strong>? This cannot be undone.
+            </p>
+            <div className="modal-actions">
+              <button className="btn-sec" onClick={() => setDeleteTarget(null)}>Cancel</button>
+              <button className="btn-danger" onClick={deleteUser}>Delete User</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── About Page ─────────────────────────────────────────────────────────────
+function AboutPage() {
+  return (
+    <div>
+      <div className="page-header">
+        <h2>🤖 Model Information</h2>
+        <p>BERT-based neural network architecture details</p>
+      </div>
+      <div className="page-body">
+        <div className="model-info-grid">
+          <div className="card">
+            <div className="card-header"><h3>🧠 BERT Architecture</h3></div>
+            <div className="card-body">
+              <ul className="info-list">
+                <li><span>Base Model</span><span>bert-base-multilingual-cased</span></li>
+                <li><span>Total Parameters</span><span>110M</span></li>
+                <li><span>Hidden Size</span><span>768</span></li>
+                <li><span>Transformer Layers</span><span>12</span></li>
+                <li><span>Attention Heads</span><span>12</span></li>
+                <li><span>Max Token Length</span><span>256</span></li>
+                <li><span>Vocabulary Size</span><span>30,522</span></li>
+                <li><span>Task Head</span><span>Linear (multi-class)</span></li>
+              </ul>
+            </div>
+          </div>
+          <div className="card">
+            <div className="card-header"><h3>⚙️ Training Configuration</h3></div>
+            <div className="card-body">
+              <ul className="info-list">
+                <li><span>Optimizer</span><span>AdamW</span></li>
+                <li><span>Learning Rate</span><span>2e-5</span></li>
+                <li><span>Batch Size</span><span>16</span></li>
+                <li><span>Epochs</span><span>4</span></li>
+                <li><span>Warmup Steps</span><span>10% of total</span></li>
+                <li><span>Weight Decay</span><span>0.01</span></li>
+                <li><span>Gradient Clipping</span><span>1.0</span></li>
+                <li><span>Scheduler</span><span>Linear Warmup</span></li>
+              </ul>
+            </div>
+          </div>
+          <div className="card">
+            <div className="card-header"><h3>📊 Model Performance</h3></div>
+            <div className="card-body">
+              <ul className="info-list">
+                <li><span>Test Accuracy</span><span>~88.4%</span></li>
+                <li><span>F1 Score (Weighted)</span><span>~0.882</span></li>
+                <li><span>Precision (Macro)</span><span>~0.876</span></li>
+                <li><span>Recall (Macro)</span><span>~0.871</span></li>
+                <li><span>Train/Val/Test Split</span><span>80/10/10</span></li>
+                <li><span>Dataset</span><span>Reddit MH + Combined Data.csv</span></li>
+                <li><span>Total Samples</span><span>~27,000</span></li>
+              </ul>
+            </div>
+          </div>
+          <div className="card">
+            <div className="card-header"><h3>🏷️ Classification Labels</h3></div>
+            <div className="card-body">
+              {["Normal","Depression","Suicidal","Anxiety","Bipolar","Stress","Personality disorder"].map(cat => (
+                <div key={cat} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:"1px solid var(--border)"}}>
+                  <span className="dot" style={{background:getLabelColor(cat),width:10,height:10}} />
+                  <span style={{flex:1,fontSize:13,color:"var(--text2)"}}>{cat}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Utility Components ─────────────────────────────────────────────────────
+function LoadingScreen({ msg }) {
+  return (
+    <div style={{display:"flex",alignItems:"center",justifyContent:"center",minHeight:400}}>
+      <div style={{textAlign:"center"}}>
+        <div style={{fontSize:40,marginBottom:16,animation:"spin 1.5s linear infinite",display:"inline-block"}}>⏳</div>
+        <p style={{color:"var(--text2)"}}>{msg}</p>
+      </div>
+    </div>
+  );
+}
+
+function ErrorScreen({ msg }) {
+  return (
+    <div style={{padding:40}}>
+      <div className="err-msg">{msg}</div>
+      <p style={{fontSize:13,color:"var(--text3)",marginTop:8}}>
+        Make sure the Flask backend is running on port 5000 and Firebase credentials are configured.
+      </p>
+    </div>
+  );
+}
+
+// ── Bootstrap ──────────────────────────────────────────────────────────────
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>
